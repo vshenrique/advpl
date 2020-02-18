@@ -1,7 +1,7 @@
 #INCLUDE 'protheus.ch'
 #INCLUDE 'parmtype.ch'
 
-user function variables()
+user function Variables()
 
     local nNumber := 1
     local lLogic := .F.
