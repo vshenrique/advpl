@@ -43,11 +43,11 @@ user function RelAssign()
 
     endCase
 
-    cMsg := "+= soma o valor da direita na variavel da esquerda: " + str(nSum) + CRLF
-    cMsg += "-= subtrai o valor da direita da variavel da esquerda: " + str(nSub) + CRLF
-    cMsg += "*= multiplica o valor da direita pela variavel da esquerda: " + str(nMult) + CRLF
-    cMsg += "/= divide o valor da direita pela variavel da esquerda: " + str(nDiv) + CRLF
-    cMsg += "%= retorna o resto da divisão do valor da direita pela variavel da esquerda: " + str(nRest)
+    cMsg := "+= soma o valor da direita na variavel da esquerda: "                          + cvaltochar(nSum) + CRLF
+    cMsg += "-= subtrai o valor da direita da variavel da esquerda: "                       + cvaltochar(nSub) + CRLF
+    cMsg += "*= multiplica o valor da direita pela variavel da esquerda: "                  + cvaltochar(nMult) + CRLF
+    cMsg += "/= divide o valor da direita pela variavel da esquerda: "                      + cvaltochar(nDiv) + CRLF
+    cMsg += "%= retorna o resto da divisão do valor da direita pela variavel da esquerda: " + cvaltochar(nRest)
 
     MSGINFO(cMsg, "Loucura")
 
