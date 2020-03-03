@@ -2,7 +2,7 @@
 #INCLUDE "TopConn.ch"
 #INCLUDE "TBICONN.ch"
 
-USER Function DatAlter(lRecLock, cTable, cName, cXcpf, dBirth, nSex, cCon, cEmail, cCep, cAdr, cNbhd, cCity, nSt, lAtv, cObs)
+USER Function DatAlter(lRecLock, cTable, cName, cXcpf, dBirth, nSex, cCon, cEmail, cCep, cAdr, cAdrNum, cNbhd, cCity, nSt, lAtv, cObs)
 
     BEGIN Transaction
         RecLock(cTable, lRecLock) // FALSE trava registro para ALTERAÇÃO, TRUE trava para INCLUSÃO
@@ -19,6 +19,7 @@ USER Function DatAlter(lRecLock, cTable, cName, cXcpf, dBirth, nSex, cCon, cEmai
         SZ1->Z1_EMAIL  := cEmail
         SZ1->Z1_CEP    := cCep
         SZ1->Z1_ADR    := cAdr
+        SZ1->Z1_ADRNUM := cAdrNum
         SZ1->Z1_NBHD   := cNbhd
         SZ1->Z1_CITY   := cCity
         SZ1->Z1_STATE  := nSt

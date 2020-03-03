@@ -9,81 +9,81 @@ user function MYGPEA01(cTable, lRecLock, lRedOnly, nOption)
 
     Local lRecAct
 
-    Local oStLabel    := Space(1)
-    Local oAdrLabel   := Space(1)
-    Local oAtvLabel   := Space(1)
-    Local oCepLabel   := Space(1)
-    Local oConLabel   := Space(1)
-    Local oCPFLabel   := Space(1)
-    Local oObsLabel   := Space(1)
-    Local oSexLabel   := Space(1)
-    Local oCityLabel  := Space(1)
-    Local oNameLabel  := Space(1)
-    Local oNbhdLabel  := Space(1)
-    Local oAdrBrLabel := Space(1)
-    Local oBirthLabel := Space(1)
-    Local oEmailLabel := Space(1)
-
-    Local bCpf        := {|u| If(PCount()>0,cXcpf   :=u,cXcpf  )}
-    Local bName       := {|u| If(PCount()>0,cName   :=u,cName  )}
-    Local bBirth      := {|u| If(PCount()>0,dBirth  :=u,dBirth )}
-    Local bBtSex      := {|u| If(PCount()>0,nSex    :=u,nSex   )}
-    Local bCon        := {|u| If(PCount()>0,cCon    :=u,cCon   )}
-    Local bEmail      := {|u| If(PCount()>0,cEmail  :=u,cEmail )}
-    Local bCep        := {|u| If(PCount()>0,cCep    :=u,cCep   )}
-    Local bAdr        := {|u| If(PCount()>0,cAdr    :=u,cAdr   )}
-    Local bAdrNbr     := {| | if(PCount()>0,cAdrNbr :=u,cAdrNbr)}
-    Local bNbhd       := {|u| If(PCount()>0,cNbhd   :=u,cNbhd  )}
-    Local bCity       := {|u| If(PCount()>0,cCity   :=u,cCity  )}
-    Local bBtSt       := {|u| If(PCount()>0,nSt     :=u,nSt    )}
-    Local bObs        := {|u| If(PCount()>0,cObs    :=u,cObs   )}
-    Local bLocDat     := {| | checkCep(cCep                    )}
-    Local bGetCpf     := {| | checkCpf(cTable, cXcpf, @lRecAct )}
-    Local bAtv        := {| | lAtv                              }
-    Local bSetAtv     := {| | lAtv:=!lAtv                       }
-
-    Local aSexes      := {"Indefinido", "Feminino", "Masculino"}
-    Local aStates     := {;
-        "AC", ;
-        "AL", ;
-        "AP", ;
-        "AM", ;
-        "BA", ;
-        "CE", ;
-        "DF", ;
-        "ES", ;
-        "GO", ;
-        "MA", ;
-        "MT", ;
-        "MS", ;
-        "MG", ;
-        "PA", ;
-        "PB", ;
-        "PR", ;
-        "PE", ;
-        "PI", ;
-        "RJ", ;
-        "RN", ;
-        "RS", ;
-        "RO", ;
-        "RR", ;
-        "SC", ;
-        "SP", ;
-        "SE", ;
-        "TO"}
-
-    PRIVATE cAdr      := Space(100)
-    PRIVATE cCep      := Space(8)
-    PRIVATE cCon      := Space(15)
-    PRIVATE cObs      := Space(100)
-    PRIVATE cCity     := Space(50)
-    PRIVATE cXcpf     := Space(11)
-    PRIVATE cName     := Space(50)
-    PRIVATE cNbhd     := Space(50)
-    PRIVATE dBirth    := STOD("")
-    PRIVATE cEmail    := Space(100)
-    PRIVATE cAdrNbr   := Space(5)
-    PRIVATE lAtv      := .F.
+    Local oStLabel     := Space(1)
+    Local oAdrLabel    := Space(1)
+    Local oAtvLabel    := Space(1)
+    Local oCepLabel    := Space(1)
+    Local oConLabel    := Space(1)
+    Local oCPFLabel    := Space(1)
+    Local oObsLabel    := Space(1)
+    Local oSexLabel    := Space(1)
+    Local oCityLabel   := Space(1)
+    Local oNameLabel   := Space(1)
+    Local oNbhdLabel   := Space(1)
+    Local oAdrNBrLabel := Space(1)
+    Local oBirthLabel  := Space(1)
+    Local oEmailLabel  := Space(1)
+ 
+    Local bCpf         := {|u| If(PCount()>0,cXcpf   :=u,cXcpf  )}
+    Local bName        := {|u| If(PCount()>0,cName   :=u,cName  )}
+    Local bBirth       := {|u| If(PCount()>0,dBirth  :=u,dBirth )}
+    Local bBtSex       := {|u| If(PCount()>0,nSex    :=u,nSex   )}
+    Local bCon         := {|u| If(PCount()>0,cCon    :=u,cCon   )}
+    Local bEmail       := {|u| If(PCount()>0,cEmail  :=u,cEmail )}
+    Local bCep         := {|u| If(PCount()>0,cCep    :=u,cCep   )}
+    Local bAdr         := {|u| If(PCount()>0,cAdr    :=u,cAdr   )}
+    Local bAdrNbr      := {|u| if(PCount()>0,cAdrNbr :=u,cAdrNbr)}
+    Local bNbhd        := {|u| If(PCount()>0,cNbhd   :=u,cNbhd  )}
+    Local bCity        := {|u| If(PCount()>0,cCity   :=u,cCity  )}
+    Local bBtSt        := {|u| If(PCount()>0,nSt     :=u,nSt    )}
+    Local bObs         := {|u| If(PCount()>0,cObs    :=u,cObs   )}
+    Local bLocDat      := {| | checkCep(cCep                    )}
+    Local bGetCpf      := {| | checkCpf(cTable, cXcpf, @lRecAct )}
+    Local bAtv         := {| | lAtv                              }
+    Local bSetAtv      := {| | lAtv:=!lAtv                       }
+ 
+    Local aSexes       := {"Indefinido", "Feminino", "Masculino"}
+    Local aStates      := {;
+        "AC", ; 
+        "AL", ; 
+        "AP", ; 
+        "AM", ; 
+        "BA", ; 
+        "CE", ; 
+        "DF", ; 
+        "ES", ; 
+        "GO", ; 
+        "MA", ; 
+        "MT", ; 
+        "MS", ; 
+        "MG", ; 
+        "PA", ; 
+        "PB", ; 
+        "PR", ; 
+        "PE", ; 
+        "PI", ; 
+        "RJ", ; 
+        "RN", ; 
+        "RS", ; 
+        "RO", ; 
+        "RR", ; 
+        "SC", ; 
+        "SP", ; 
+        "SE", ; 
+        "TO"} 
+ 
+    PRIVATE cAdr       := Space(100)
+    PRIVATE cCep       := Space(8)
+    PRIVATE cCon       := Space(15)
+    PRIVATE cObs       := Space(100)
+    PRIVATE cCity      := Space(50)
+    PRIVATE cXcpf      := Space(11)
+    PRIVATE cName      := Space(50)
+    PRIVATE cNbhd      := Space(50)
+    PRIVATE dBirth     := STOD("")
+    PRIVATE cEmail     := Space(100)
+    PRIVATE cAdrNbr    := Space(5)
+    PRIVATE lAtv       := .F.
     PRIVATE nSt
     PRIVATE nSex
 
@@ -103,7 +103,7 @@ user function MYGPEA01(cTable, lRecLock, lRedOnly, nOption)
     oEmailLabel  := TSay():New( 075,012,{||"E-mail:"            },oNewEmployee,,,.F.,.F.,.F.,.T.,CLR_BLACK,CLR_WHITE,016,008)
     oCepLabel    := TSay():New( 087,012,{||"CEP:"               },oNewEmployee,,,.F.,.F.,.F.,.T.,CLR_BLACK,CLR_WHITE,016,008)
     oAdrLabel    := TSay():New( 100,012,{||"Endereço:"          },oNewEmployee,,,.F.,.F.,.F.,.T.,CLR_BLACK,CLR_WHITE,028,008)
-    oAdrBrLabel  := TSay():New( 112,012,{||"Número:"            },oNewEmployee,,,.F.,.F.,.F.,.T.,CLR_BLACK,CLR_WHITE,028,008)
+    oAdrNbrLabel := TSay():New( 112,012,{||"Número:"            },oNewEmployee,,,.F.,.F.,.F.,.T.,CLR_BLACK,CLR_WHITE,028,008)
     oNbhdLabel   := TSay():New( 125,012,{||"Bairro:"            },oNewEmployee,,,.F.,.F.,.F.,.T.,CLR_BLACK,CLR_WHITE,032,008)
     oCityLabel   := TSay():New( 137,012,{||"Cidade:"            },oNewEmployee,,,.F.,.F.,.F.,.T.,CLR_BLACK,CLR_WHITE,032,008)
     oStLabel     := TSay():New( 150,012,{||"Estado:"            },oNewEmployee,,,.F.,.F.,.F.,.T.,CLR_BLACK,CLR_WHITE,032,008)
@@ -131,7 +131,7 @@ user function MYGPEA01(cTable, lRecLock, lRedOnly, nOption)
         oDataAlter   := TButton():New( 214,112,"EXCLUIR" ,oNewEmployee,{||U_DelReg(cTable, lRecAct), oNewEmployee:End() },037,012,,,,.T.,,"",,,,.F. )
         oCancel      := TButton():New( 214,156,"CANCELAR",oNewEmployee,{||oNewEmployee:End()},037,012,,,,.T.,,"",,,,.F. )
     else
-        oDataAlter   := TButton():New( 214,112,"SALVAR"  ,oNewEmployee,{||U_DatAlter(lRecAct, cTable, cName, cXcpf, dBirth, nSex, cCon, cEmail, cCep, cAdr, cNbhd, cCity, nSt, lAtv, cObs), oNewEmployee:End() },037,012,,,,.T.,,"",,,,.F. )
+        oDataAlter   := TButton():New( 214,112,"SALVAR"  ,oNewEmployee,{||U_DatAlter(lRecAct, cTable, cName, cXcpf, dBirth, nSex, cCon, cEmail, cCep, cAdr, cAdrNbr, cNbhd, cCity, nSt, lAtv, cObs), oNewEmployee:End() },037,012,,,,.T.,,"",,,,.F. )
         oCancel      := TButton():New( 214,156,"CANCELAR",oNewEmployee,{||oNewEmployee:End()},037,012,,,,.T.,,"",,,,.F. )
     endif
 
@@ -179,6 +179,7 @@ Static Function GetZ1Dat()
     cEmail  := SZ1->Z1_EMAIL
     cCep    := SZ1->Z1_CEP
     cAdr    := SZ1->Z1_ADR
+    cAdrNbr := SZ1->Z1_ADRNUM
     cNbhd   := SZ1->Z1_NBHD
     cCity   := SZ1->Z1_CITY
     nSt     := SZ1->Z1_STATE
