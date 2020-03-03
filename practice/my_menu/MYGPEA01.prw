@@ -1,14 +1,10 @@
-#INCLUDE "protheus.ch"
-#INCLUDE "TopConn.ch"
-#INCLUDE "TBICONN.ch"
-#INCLUDE 'RWMAKE.CH'
-#INCLUDE 'FONT.CH'
-#INCLUDE 'COLORS.CH'
+#include 'colors.ch'
 
 user function MYGPEA01(cTable, lRecLock, lRedOnly, nOption)
 
-    Local lRecAct
+    Local lRecAct // Mesma variável que lRecLock, porém com valor mutável pelo código
 
+    // ----- Declaração de objetos referentes as Labels da tela ----- //
     Local oStLabel     := Space(1)
     Local oAdrLabel    := Space(1)
     Local oAtvLabel    := Space(1)
@@ -24,6 +20,7 @@ user function MYGPEA01(cTable, lRecLock, lRedOnly, nOption)
     Local oBirthLabel  := Space(1)
     Local oEmailLabel  := Space(1)
  
+    // ----- Declaração dos blocos de código para setar as informações dos inputs ----- //
     Local bCpf         := {|u| If(PCount()>0,cXcpf   :=u,cXcpf  )}
     Local bName        := {|u| If(PCount()>0,cName   :=u,cName  )}
     Local bBirth       := {|u| If(PCount()>0,dBirth  :=u,dBirth )}
@@ -42,6 +39,7 @@ user function MYGPEA01(cTable, lRecLock, lRedOnly, nOption)
     Local bAtv         := {| | lAtv                              }
     Local bSetAtv      := {| | lAtv:=!lAtv                       }
  
+    // ----- Declaração dos arrays de opções para os ComboBoxes ----- //
     Local aSexes       := {"Indefinido", "Feminino", "Masculino"}
     Local aStates      := {;
         "AC", ; 
@@ -72,6 +70,7 @@ user function MYGPEA01(cTable, lRecLock, lRedOnly, nOption)
         "SE", ; 
         "TO"} 
  
+    // ----- Declaração das variáveis em si ----- //
     PRIVATE cAdr       := Space(100)
     PRIVATE cCep       := Space(8)
     PRIVATE cCon       := Space(15)
@@ -89,10 +88,12 @@ user function MYGPEA01(cTable, lRecLock, lRedOnly, nOption)
 
     lRecAct := lRecLock
 
-    if (nOption != 3) // Popula o form caso não seja uma inclusão
+    // ----- Popula o form caso não seja uma inclusão ---- //
+    if (nOption != 3)
         GetZ1Dat()
     endif
 
+    // ----- Inicio da criação da tela -----// 
     oNewEmployee := MSDialog():New( 090,218,548,632,"Cadastro de Funcionário",,,.F.,,,,,,.T.,,,.T. )
 
     oCPFLabel    := TSay():New( 012,012,{||"CPF:"               },oNewEmployee,,,.F.,.F.,.F.,.T.,CLR_BLACK,CLR_WHITE,012,008)
@@ -125,6 +126,7 @@ user function MYGPEA01(cTable, lRecLock, lRedOnly, nOption)
     oAtv         := TCheckBox():New(162,067,"",bAtv,oNewEmployee,008,008,                   ,bSetAtv,,,CLR_BLACK,CLR_WHITE,,.T.,"",, )
     oObs         := TMultiGet():New(175,067,bObs   ,oNewEmployee,125,030,                   ,       ,  CLR_BLACK,CLR_WHITE,,.T.,"",,,.F.,.F.,lRedOnly,,,.F.,, )
 
+    // ----- Os botões devem ser diferenciados seguindo o tipo de tela chamada ----- //
     if (nOption == 2)
         oDataAlter   := TButton():New( 214,156,"OK"  ,oNewEmployee,{||oNewEmployee:End()},037,012,,,,.T.,,"",,,,.F. )
     elseif (nOption == 5)
@@ -136,9 +138,13 @@ user function MYGPEA01(cTable, lRecLock, lRedOnly, nOption)
     endif
 
     oNewEmployee:Activate(,,,.T.)
+    // ----- Fim da tela e chamada de ativação ----- //
 
 return
 
+/** Função checa se o CPF entrado na tela Inserir já está no banco,
+    se estiver alerta o usuário e carrega o cadastro prévio e 
+    altera o funcionamento de inserir para alterar. **/
 Static Function checkCpf(cTable, cXcpf, lRecAct)
 
     DBSETORDER(2)
@@ -151,6 +157,10 @@ Static Function checkCpf(cTable, cXcpf, lRecAct)
 
 return .T.
 
+/** Função busca o CEP inserido e retorna com os dados de localidade
+    referentes ao CEP. Caso tenha algum erro durante a busca,
+    o programa retorna a mensagem de erro para que o usuário
+    decida se vai tentar inserir novamente ou fechar a rotina. **/
 Static Function checkCep(cCep)
 
     Local aInfo := {}
@@ -162,13 +172,14 @@ Static Function checkCep(cCep)
         cCity := aInfo[3]
         nSt   := aInfo[4]
     else
-        if (MSGYESNO("Erro no processamento do CEP, deseja encerrar?"))
+        if (MSGYESNO("Erro no processamento do CEP, deseja encerrar?", "Erro no CEP"))
             oNewEmployee:End()
         endif
     endif
 
 return
 
+/** Função para popular as variáveis com os dados já cadastrados. **/
 Static Function GetZ1Dat()
 
     cXcpf   := SZ1->Z1_CPF

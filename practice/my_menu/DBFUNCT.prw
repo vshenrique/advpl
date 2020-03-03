@@ -1,15 +1,15 @@
-#INCLUDE "protheus.ch"
-#INCLUDE "TopConn.ch"
-#INCLUDE "TBICONN.ch"
+#include "TopConn.ch"
 
+/** Função de inserir ou alterar, sendo alterada pelo valor da variável
+    lRecLock, podendo ser TRUE para inserir e FALSE para alterar. **/
 USER Function DatAlter(lRecLock, cTable, cName, cXcpf, dBirth, nSex, cCon, cEmail, cCep, cAdr, cAdrNum, cNbhd, cCity, nSt, lAtv, cObs)
 
     BEGIN Transaction
-        RecLock(cTable, lRecLock) // FALSE trava registro para ALTERAÇÃO, TRUE trava para INCLUSÃO
+        RecLock(cTable, lRecLock)
 
         SZ1->Z1_FILIAL := XFilial(cTable)
-        if (lRecLock == .T.)
-            SZ1->Z1_COD    := GetSxeNum(cTable, "Z1_COD")
+        if (lRecLock == .T.)                              // O if trata se o código já existe no banco e se existir apenas não altera o valor.
+            SZ1->Z1_COD    := GetSxeNum(cTable, "Z1_COD") // GetSxeNum automáticamente pega o ultimo número do campo Z1_COD e soma um
         endif
         SZ1->Z1_NAME   := cName
         SZ1->Z1_CPF    := cXcpf
@@ -25,13 +25,14 @@ USER Function DatAlter(lRecLock, cTable, cName, cXcpf, dBirth, nSex, cCon, cEmai
         SZ1->Z1_STATE  := nSt
         SZ1->Z1_ACTIVE := lAtv
         SZ1->Z1_OBS    := cObs
-        ConfirmSx8()
+        ConfirmSx8() 
         
         MsUnlock()
     END Transaction
 
 Return
 
+/** Função básica para deletar o registro selecionado. **/
 User Function DelReg(cTable, lReclock)
 
     if (MSGNOYES( "DESEJA REALMENTE EXCLUIR ESSE REGISTRO?", "EXCLUSÃO DE REGISTRO" ))
