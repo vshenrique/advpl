@@ -5,12 +5,12 @@
 #Define lxTrace .T.
 
 /*
-    ZDFINBXT
+    AUTNCCBX
     Função de Baixa Automática de Títulos NCC feita por Job
     Victor Santos Henrique
     03/11/2020
 */
-User Function ZDFINBXT()
+User Function AUTNCCBX()
 	Local oProgresso 
 	Local aAreaSE1 := {} 
 
@@ -39,9 +39,9 @@ Return lRet
 
 Static Function RunProcBar(oProgresso)
 	If lJob 
-		aadd(axLog, 'Job ZDFINBXT iniciando: ' + DTOC(Date()) + ' - ' + Time() + CRLF)
+		aadd(axLog, 'Job AUTNCCBX iniciando: ' + DTOC(Date()) + ' - ' + Time() + CRLF)
 	Else
-		aadd(axLog, 'Chamada direta ZDFINBXT iniciando: ' + DTOC(Date()) + ' - ' + Time() + CRLF)
+		aadd(axLog, 'Chamada direta AUTNCCBX iniciando: ' + DTOC(Date()) + ' - ' + Time() + CRLF)
 	EndIf
 
 	bLastError := ErrorBlock({|e| oError := e})
@@ -119,8 +119,7 @@ Static Function GetTitNCC(oProgresso)
 					WHERE  
 						SD1.%NotDel% 
 						AND D1_TIPO     = 'D' 
-						AND D1_FORMUL   = 'S' 
-						// AND D1_DTDIGIT  < '20201211'
+						AND D1_FORMUL   = 'S'
 						AND D1_DTDIGIT  <= %exp:dDataComp%
 					GROUP BY D1_SERIE+D1_DOC+D1_FORNECE+D1_LOJA+D1_FILIAL
 				)  AS AUX 
@@ -166,9 +165,6 @@ Static Function GetTitNF(oProgresso)
 	ENDSQL
 Return
 
-/*
-    Processamento de 
-*/
 Static Function ProcDados(oProgresso)
 	Local cIdentNCC  := ""
 
@@ -373,7 +369,7 @@ Static Function ProcTits()
 			SE1->(dbGoTo((cxAliNF)->RECNF))
 			If !Empty(SE1->E1_IDCNAB) .And. !Empty(SE1->E1_PORTADO)
 				aItemsFI2 := {}
-				Aadd( aItemsFI2, { GetMV('ZDFINBXT01', .F., '02'), ,Transform(nSaldoComp,X3Picture('E1_SALDO')), Transform(0,X3Picture('E1_SALDO')), 'E1_SALDO','N' } )
+				Aadd( aItemsFI2, { GetMV('AUTNCCBX01', .F., '02'), ,Transform(nSaldoComp,X3Picture('E1_SALDO')), Transform(0,X3Picture('E1_SALDO')), 'E1_SALDO','N' } )
 				aadd(axLog, '    Gravando FI2 para banco... ')
 				FinGrvFI2()
 			Endif
