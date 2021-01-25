@@ -2,13 +2,14 @@
 #Include "BEL.CH"
 #include 'tbiconn.ch'
 
-User Function AUTEMPTR()
+User Function ZDFINM01()
+    Private nTotal    := 0
     Private cxAlias   := GetNextAlias()
     Private aBrowse   := {}
     Private aFields   := {}
     Private cMarca    := GetMark()
     Private nValor    := 0
-    Private oDlg
+    Private oTrfDlg
     Private oMarked   := LoadBitmap( GetResources(), "LBOK" )
     Private oNoMarked := LoadBitmap( GetResources(), "LBNO" )
     Private cFornec   := "011011"
@@ -18,8 +19,9 @@ User Function AUTEMPTR()
     Private cContaZD  := ""
     Private dDataIni  := ""
     Private dDataFim  := ""
+    Private oVTotal
 
-    If !Pergunte("AUTEMPTR", .T.)
+    If !Pergunte("ZDFINM01", .T.)
         Return .F.
     EndIf
 
@@ -48,7 +50,7 @@ User Function AUTEMPTR()
             ,E1_LOJA
             ,E1_SALDO
             ,SE1.R_E_C_N_O_ AS RECNOE1
-        FROM SE2010 AS SE2
+        FROM %Table:SE2% AS SE2
             INNER JOIN SE1070 AS SE1
                 ON  E1_FILIAL  = E2_FILIAL
                 AND E1_PREFIXO = E2_PREFIXO
@@ -56,7 +58,7 @@ User Function AUTEMPTR()
                 AND E1_SALDO   = E2_SALDO
                 AND E1_SALDO > 0
         WHERE
-                E2_FILIAL          = '  '
+                E2_FILIAL          = %exp:xFilial("SE2")%
             AND E2_FORNECE         = %exp:cFornec%
             AND E2_LOJA            = %exp:cLoja%
             AND E2_EMISSAO  BETWEEN  %exp:MV_PAR01% AND %exp:MV_PAR02%
@@ -78,10 +80,10 @@ User Function AUTEMPTR()
         ORDER BY E1_EMISSAO, E1_PREFIXO, E1_NUM
     ENDSQL
 
-    DEFINE DIALOG oDlg TITLE "Títulos para Baixa" FROM 180,180 TO 755,1360 PIXEL
+    DEFINE DIALOG oTrfDlg TITLE "Títulos para Baixa" FROM 180,180 TO 755,1360 PIXEL
   
         If (cxAlias)->( EOF() )
-            MsgInfo("AUTEMPTR", "Não há títulos para pagar!")
+            MsgInfo("ZDFINM01", "Não há títulos para pagar!")
             Return
         Else
             While !(cxAlias)->( EOF() )
@@ -131,53 +133,80 @@ User Function AUTEMPTR()
                     'Saldo SE1'       } // [17]
 
         // Cria Browse
-        oBrowse := TCBrowse():New(  01, 01, 590, 260, , aClone(aFields), { 20, 50, 50, 50 }, oDlg, , , , , {||}, , , , , , , .F., , .T., , .F., , , )
+        oFinaBrw := TCBrowse():New(  01, 01, 590, 260, , aClone(aFields), { 20, 50, 50, 50 }, oTrfDlg, , , , , {||}, , , , , , , .F., , .T., , .F., , , )
 
         // Seta vetor para a browse
-        oBrowse:SetArray(aBrowse)
+        oFinaBrw:SetArray(aBrowse)
 
-        oBrowse:AddColumn( TcColumn():New( ''               , { || IIF(aBrowse[oBrowse:nAt, 01], oMarked, oNoMarked) }, "@!"                  , , , "CENTER", 015, .T., .F., , , , .F., ) )
-        oBrowse:AddColumn( TCColumn():New( aFields[02], { ||     aBrowse[oBrowse:nAt, 02]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
-        oBrowse:AddColumn( TCColumn():New( aFields[03], { ||     aBrowse[oBrowse:nAt, 03]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
-        oBrowse:AddColumn( TCColumn():New( aFields[04], { ||     aBrowse[oBrowse:nAt, 04]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
-        oBrowse:AddColumn( TCColumn():New( aFields[05], { ||     aBrowse[oBrowse:nAt, 05]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
-        oBrowse:AddColumn( TCColumn():New( aFields[06], { ||     aBrowse[oBrowse:nAt, 06]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
-        oBrowse:AddColumn( TCColumn():New( aFields[07], { ||     aBrowse[oBrowse:nAt, 07]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
-        oBrowse:AddColumn( TCColumn():New( aFields[08], { ||     aBrowse[oBrowse:nAt, 08]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
-        oBrowse:AddColumn( TCColumn():New( aFields[09], { ||     aBrowse[oBrowse:nAt, 09]                      }, '@E 99,999,999,999.99', , , "RIGHT" ,    , .F., .T., , , , .F., ) )
-        oBrowse:AddColumn( TCColumn():New( aFields[10], { ||     aBrowse[oBrowse:nAt, 10]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
-        oBrowse:AddColumn( TCColumn():New( aFields[11], { ||     aBrowse[oBrowse:nAt, 11]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
-        oBrowse:AddColumn( TCColumn():New( aFields[12], { ||     aBrowse[oBrowse:nAt, 12]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
-        oBrowse:AddColumn( TCColumn():New( aFields[13], { ||     aBrowse[oBrowse:nAt, 13]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
-        oBrowse:AddColumn( TCColumn():New( aFields[14], { ||     aBrowse[oBrowse:nAt, 14]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
-        oBrowse:AddColumn( TCColumn():New( aFields[15], { ||     aBrowse[oBrowse:nAt, 15]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
-        oBrowse:AddColumn( TCColumn():New( aFields[16], { ||     aBrowse[oBrowse:nAt, 16]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
-        oBrowse:AddColumn( TCColumn():New( aFields[17], { ||     aBrowse[oBrowse:nAt, 17]                      }, '@E 99,999,999,999.99', , , "RIGHT" ,    , .F., .T., , , , .F., ) )
+        oFinaBrw:AddColumn( TcColumn():New( ''         , { || IIF(aBrowse[oFinaBrw:nAt, 01], oMarked, oNoMarked) }, "@!"                  , , , "CENTER", 015, .T., .F., , , , .F., ) )
+        oFinaBrw:AddColumn( TCColumn():New( aFields[02], { ||     aBrowse[oFinaBrw:nAt, 02]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
+        oFinaBrw:AddColumn( TCColumn():New( aFields[03], { ||     aBrowse[oFinaBrw:nAt, 03]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
+        oFinaBrw:AddColumn( TCColumn():New( aFields[04], { ||     aBrowse[oFinaBrw:nAt, 04]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
+        oFinaBrw:AddColumn( TCColumn():New( aFields[05], { ||     aBrowse[oFinaBrw:nAt, 05]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
+        oFinaBrw:AddColumn( TCColumn():New( aFields[06], { ||     aBrowse[oFinaBrw:nAt, 06]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
+        oFinaBrw:AddColumn( TCColumn():New( aFields[07], { ||     aBrowse[oFinaBrw:nAt, 07]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
+        oFinaBrw:AddColumn( TCColumn():New( aFields[08], { ||     aBrowse[oFinaBrw:nAt, 08]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
+        oFinaBrw:AddColumn( TCColumn():New( aFields[09], { ||     aBrowse[oFinaBrw:nAt, 09]                      }, '@E 99,999,999,999.99', , , "RIGHT" ,    , .F., .T., , , , .F., ) )
+        oFinaBrw:AddColumn( TCColumn():New( aFields[10], { ||     aBrowse[oFinaBrw:nAt, 10]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
+        oFinaBrw:AddColumn( TCColumn():New( aFields[11], { ||     aBrowse[oFinaBrw:nAt, 11]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
+        oFinaBrw:AddColumn( TCColumn():New( aFields[12], { ||     aBrowse[oFinaBrw:nAt, 12]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
+        oFinaBrw:AddColumn( TCColumn():New( aFields[13], { ||     aBrowse[oFinaBrw:nAt, 13]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
+        oFinaBrw:AddColumn( TCColumn():New( aFields[14], { ||     aBrowse[oFinaBrw:nAt, 14]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
+        oFinaBrw:AddColumn( TCColumn():New( aFields[15], { ||     aBrowse[oFinaBrw:nAt, 15]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
+        oFinaBrw:AddColumn( TCColumn():New( aFields[16], { ||     aBrowse[oFinaBrw:nAt, 16]                      },                       , , , "LEFT"  ,    , .F., .T., , , , .F., ) )
+        oFinaBrw:AddColumn( TCColumn():New( aFields[17], { ||     aBrowse[oFinaBrw:nAt, 17]                      }, '@E 99,999,999,999.99', , , "RIGHT" ,    , .F., .T., , , , .F., ) )
 
         // Evento de duplo click na celula
-        oBrowse:bLDblClick := { || MarcaBrw() }
+        oFinaBrw:bLDblClick := { || MarcaBrw() }
 
         // Cria Botoes com metodos básicos
-        TButton():New( 270, 002, "Voltar ao topo" , oDlg, { || oBrowse:GoTop()   ,oBrowse:setFocus()    }, 40, 010,,,.F.,.T.,.F.,,.F.,,,.F. )
-        TButton():New( 270, 052, "Ir para o Fim"  , oDlg, { || oBrowse:GoBottom(),oBrowse:setFocus()    }, 40, 010,,,.F.,.T.,.F.,,.F.,,,.F. )
-        TButton():New( 270, 102, "Total de Linhas", oDlg, { || MsgInfo(oBrowse:nLen, 'Total de linhas') }, 40, 010,,,.F.,.T.,.F.,,.F.,,,.F. )
-        TButton():New( 270, 175, "Cancelar"       , oDlg, { || oDlg:End()                               }, 40, 010,,,.F.,.T.,.F.,,.F.,,,.F. )
-        TButton():New( 270, 225, "Marcar Todos"   , oDlg, { || MarcaTudo()                              }, 40, 010,,,.F.,.T.,.F.,,.F.,,,.F. )
-        TButton():New( 270, 275, "Desmarcar Todos", oDlg, { || DesmarcarTodos()                         }, 50, 010,,,.F.,.T.,.F.,,.F.,,,.F. )
-        TButton():New( 270, 335, "Criar Fatura"   , oDlg, { || FatTitulos()                             }, 40, 010,,,.F.,.T.,.F.,,.F.,,,.F. )
+        TButton():New( 270, 002, "Voltar ao topo" , oTrfDlg, { || oFinaBrw:GoTop()   ,oFinaBrw:setFocus()    }, 40, 010,,,.F.,.T.,.F.,,.F.,,,.F. )
+        TButton():New( 270, 052, "Ir para o Fim"  , oTrfDlg, { || oFinaBrw:GoBottom(),oFinaBrw:setFocus()    }, 40, 010,,,.F.,.T.,.F.,,.F.,,,.F. )
+        TButton():New( 270, 102, "Total de Linhas", oTrfDlg, { || MsgInfo(oFinaBrw:nLen, 'Total de linhas') }, 40, 010,,,.F.,.T.,.F.,,.F.,,,.F. )
+        TButton():New( 270, 175, "Cancelar"       , oTrfDlg, { || oTrfDlg:End()                               }, 40, 010,,,.F.,.T.,.F.,,.F.,,,.F. )
+        TButton():New( 270, 225, "Marcar Todos"   , oTrfDlg, { || MarcaTudo()                              }, 40, 010,,,.F.,.T.,.F.,,.F.,,,.F. )
+        TButton():New( 270, 275, "Desmarcar Todos", oTrfDlg, { || DesmarcarTodos()                         }, 50, 010,,,.F.,.T.,.F.,,.F.,,,.F. )
+        TButton():New( 270, 335, "Criar Fatura"   , oTrfDlg, { || FatTitulos()                             }, 40, 010,,,.F.,.T.,.F.,,.F.,,,.F. )
 
-    ACTIVATE DIALOG oDlg CENTERED
+        // Cria Fonte para visualização
+        oFont := TFont():New('Arial',,-14,.T.)
+        
+        // Usando o método New
+        oSTotal:= TSay():New( 272, 430, { || 'Valor Total R$ ' } ,oTrfDlg,, oFont,,,, .T., CLR_RED, CLR_WHITE, 200, 20)
+        
+        // Usando o método Create
+        oSTotal:= TSay():New( 272, 475, { || Transform( nTotal, '@E 999,999,999.99' ) }, oTrfDlg,, oFont,,,, .T., CLR_RED, CLR_WHITE, 200, 20)
+        nTotal := CalcTot()
+
+    ACTIVATE DIALOG oTrfDlg CENTERED
+
 Return
 
+Static Function CalcTot()
+    Local nI := 0
+
+    nTotal := 0
+    ProcRegua( Len( aBrowse ) )
+    For nI := 1 to Len( aBrowse )
+        If aBrowse[nI,01]
+            nTotal += aBrowse[nI,09]
+        Endif
+        IncProc()
+    Next nI
+
+    oSTotal:Refresh()
+Return nTotal
+
 Static Function MarcaBrw()
-	If aBrowse[oBrowse:nAt,01]
-        aBrowse[oBrowse:nAt,01] := .F.
+	If aBrowse[oFinaBrw:nAt,01]
+        aBrowse[oFinaBrw:nAt,01] := .F.
 	Else
-		aBrowse[oBrowse:nAt,01] := .T.
+		aBrowse[oFinaBrw:nAt,01] := .T.
 	Endif
 
-	oBrowse:Refresh()
-	oDlg:Refresh()
+    Processa( { || CalcTot() }, "Processando...", "Somando valores selecionados", .F.)
+	oFinaBrw:Refresh()
+	oTrfDlg:Refresh()
 Return
 
 Static Function MarcaTudo()
@@ -189,8 +218,9 @@ Static Function MarcaTudo()
         EndIf
     Next
 
-    oBrowse:Refresh()
-	oDlg:Refresh()
+    Processa( { || CalcTot() }, "Processando...", "Somando valores selecionados", .F.)
+    oFinaBrw:Refresh()
+	oTrfDlg:Refresh()
 Return
 
 Static Function DesmarcarTodos()
@@ -202,8 +232,9 @@ Static Function DesmarcarTodos()
         EndIf
     Next
 
-    oBrowse:Refresh()
-	oDlg:Refresh()
+    Processa( { || CalcTot() }, "Processando...", "Somando valores selecionados", .F.)
+    oFinaBrw:Refresh()
+	oTrfDlg:Refresh()
 Return
 
 Static Function FatTitulos()
@@ -250,19 +281,19 @@ Static Function ProcSE1()
     MV_PAR05 := 1
     MV_PAR06 := 1
 
-	aFatura := {"FAT"         ,; // [01] - Prefixo
-                "FT "         ,; // [02] - Tipo
-                cFatura       ,; // [03] - Numero da Fatura (se o numero estiver em branco obtem pelo FINA290)
-                "23006"       ,; // [04] - Natureza "23006"
-                dDataIni      ,; // [05] - Data de
-                dDataFim      ,; // [06] - Data Ate
-                cFornec       ,; // [07] - Fornecedor
-                cLoja         ,; // [08] - Loja
-                cFornec       ,; // [09] - Fornecedor para geracao
-                cLoja         ,; // [10] - Loja do fornecedor para geracao
-                "006"         ,; // [11] - Condicao de pagto
-                              ,; // [12] - Moeda
-                aTitulos       } // [13] - ARRAY com os titulos da fatura, [13,1] - Prefixo, [13,2] - Numero, [13,3] - Parcela, [13,4] - Tipo, [13,5] - Título localizado na geracao de fatura (lógico). Iniciar com falso.} // [13] - ARRAY com os titulos da fatura, [13,1] - Prefixo, [13,2] - Numero, [13,3] - Parcela, [13,4] - Tipo, [13,5] - Título localizado na geracao de fatura (lógico). Iniciar com falso.
+	aFatura := {"FAT"   ,; // [01] - Prefixo
+                "FT "   ,; // [02] - Tipo
+                cFatura ,; // [03] - Numero da Fatura (se o numero estiver em branco obtem pelo FINA290)
+                "23006" ,; // [04] - Natureza "23006"
+                dDataIni,; // [05] - Data de
+                dDataFim,; // [06] - Data Ate
+                cFornec ,; // [07] - Fornecedor
+                cLoja   ,; // [08] - Loja
+                cFornec ,; // [09] - Fornecedor para geracao
+                cLoja   ,; // [10] - Loja do fornecedor para geracao
+                "006"   ,; // [11] - Condicao de pagto
+                        ,; // [12] - Moeda
+                aTitulos } // [13] - ARRAY com os titulos da fatura, [13,1] - Prefixo, [13,2] - Numero, [13,3] - Parcela, [13,4] - Tipo, [13,5] - Título localizado na geracao de fatura (lógico). Iniciar com falso.} // [13] - ARRAY com os titulos da fatura, [13,1] - Prefixo, [13,2] - Numero, [13,3] - Parcela, [13,4] - Tipo, [13,5] - Título localizado na geracao de fatura (lógico). Iniciar com falso.
 
 	MsExecAuto( { |x,y| FINA290(x, y) }, 3, aFatura )
 
@@ -300,7 +331,7 @@ Static Function ProcSE1()
             { "E2_TIPO"   , SE2->E2_TIPO      , Nil }, ;
             { "AUTMOTBX"  , "NOR"             , Nil }, ;
             { "AUTDTBAIXA", dDatabase         , Nil }, ;
-            { "AUTHIST"   , "Bx Auto AUTEMPTR - Fat " + cFatura, Nil }, ;
+            { "AUTHIST"   , "Bx Auto ZDFINM01 - Fat " + cFatura, Nil }, ;
             { "AUTVLRPG"  , SE2->E2_SALDO     , Nil }  ;
         }
         
@@ -309,15 +340,15 @@ Static Function ProcSE1()
         If lMsErroAuto
             lRet  := .F.
             MostraErro()
-            MsgAlert("AUTEMPTR", "Erro ao baixar fatura " + cFatura)
+            MsgAlert("ZDFINM01", "Erro ao baixar fatura " + cFatura)
         Else
             MsgInfo("Fatura Baixada", cFatura)
-            lRet := StartJob( "U_BXEMPRE2", GetEnvServer(), .T., aRecnos, cFatura )
+            lRet := StartJob( "U_BXBELLOG", GetEnvServer(), .T., aRecnos, cFatura )
 
             If lRet
-                MsgInfo("Títulos da fatura ZD " + cFatura + "baixados com sucesso!", "AUTEMPTR")
+                MsgInfo("Títulos da fatura ZD " + cFatura + "baixados com sucesso!", "ZDFINM01")
             Else
-                MsgAlert("Erro na baixa de títulos a receber Bel Logística, favor consultar o log!", "AUTEMPTR")
+                MsgAlert("Erro na baixa de títulos a receber Bel Logística, favor consultar o log!", "ZDFINM01")
             EndIf
         EndIf
 	EndIf
@@ -325,7 +356,7 @@ Static Function ProcSE1()
     IncProc()
 Return lRet
 
-User Function BXEMPRE2( aRecnos, cFatura )
+User Function BXBELLOG( aRecnos, cFatura )
     Local lRet   := .T.
     Local aBxSE1 := {}
     Local nx     := 0
@@ -347,7 +378,7 @@ User Function BXEMPRE2( aRecnos, cFatura )
                 { "AUTAGENCIA"  , "34932"              , Nil },;
                 { "AUTCONTA"    , PadR( "130-9", TamSX3("E1_CONTA")[1] ), Nil },;
                 { "AUTDTBAIXA"  , dDataBase            , Nil },;
-                { "AUTHIST"     , "Bx Auto AUTEMPTR - Fat " + cFatura, Nil },;
+                { "AUTHIST"     , "Bx Auto ZDFINM01 - Fat " + cFatura, Nil },;
                 { "AUTVALREC"   , SE1->E1_SALDO        , Nil };
             }
 
@@ -355,7 +386,7 @@ User Function BXEMPRE2( aRecnos, cFatura )
             MSExecAuto( { |x| Fina070( x ) }, aBxSE1 )
             If lMsErroAuto
                 lRet := .F.
-                MostraErro('\log\AUTEMPTR\', 'Fat_' + cFatura + '.log')
+                MostraErro('\log\ZDFINM01\', 'Fat_' + cFatura + '.log')
             EndIf
         Next
     RpcClearEnv()
